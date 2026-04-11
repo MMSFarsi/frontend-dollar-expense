@@ -13,7 +13,7 @@ const Login = ({ onLoginSuccess }) => {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', formData);
+      const res = await axios.post('https://backend-kidsland-dollar.vercel.app/api/auth/login', formData);
       localStorage.setItem('adminToken', res.data.token);
       onLoginSuccess();
     } catch (err) {

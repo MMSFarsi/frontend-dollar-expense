@@ -31,9 +31,9 @@ const TransactionList = ({ transactions }) => {
               {t.type === 'income' ? '+' : '-'}${t.amount.toFixed(2)}
             </div>
             {t.proofImage && (
-              <a href={`http://localhost:5000${t.proofImage}`} target="_blank" rel="noopener noreferrer" title="View Proof">
+              <a href={`https://backend-kidsland-dollar.vercel.app${t.proofImage}`} target="_blank" rel="noopener noreferrer" title="View Proof">
                 <img 
-                  src={`http://localhost:5000${t.proofImage}`} 
+                  src={`https://backend-kidsland-dollar.vercel.app${t.proofImage}`} 
                   alt="Proof" 
                   className="proof-img" 
                 />

@@ -40,7 +40,7 @@ const TransactionForm = ({ onAdded }) => {
 
     try {
       const token = localStorage.getItem('adminToken');
-      await axios.post('http://localhost:5000/api/transactions', submitData, {
+      await axios.post('https://backend-kidsland-dollar.vercel.app/api/transactions', submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`

@@ -19,7 +19,7 @@ function App() {
 
   const fetchTransactions = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/transactions');
+      const res = await axios.get('https://backend-kidsland-dollar.vercel.app/api/transactions');
       setTransactions(res.data);
     } catch (error) {
       console.error("Error fetching transactions", error);
