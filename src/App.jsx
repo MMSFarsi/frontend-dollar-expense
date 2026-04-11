@@ -85,7 +85,9 @@ function App() {
       </main>
 
       <footer style={{ textAlign: 'center', marginTop: '3rem', padding: '1rem', color: 'var(--text-light)', fontSize: '0.9rem' }}>
-        Developed By Mir Md Salman Farsi
+        <a href="https://mirmdsalmanfarsi.netlify.app/" target="_blank" rel="noopener noreferrer">
+          Developed By Mir Md Salman Farsi
+        </a>
       </footer>
     </div>
   );
