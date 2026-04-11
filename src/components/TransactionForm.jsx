@@ -7,6 +7,7 @@ const TransactionForm = ({ onAdded }) => {
     type: 'income',
     amount: '',
     description: '',
+    date: new Date().toISOString().split('T')[0],
   });
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -61,6 +62,7 @@ const TransactionForm = ({ onAdded }) => {
       type: formData.type,
       amount: parsedAmount,           // Fix 4: Send as number, not string
       description: formData.description,
+      date: formData.date,
       ...(imgUrl && { proofImage: imgUrl }),
     };
 
@@ -115,6 +117,18 @@ const TransactionForm = ({ onAdded }) => {
             onChange={handleChange}
             step="0.01"
             min="0"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Date</label>
+          <input
+            type="date"
+            name="date"
+            className="form-control"
+            value={formData.date}
+            onChange={handleChange}
             required
           />
         </div>
