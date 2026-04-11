@@ -44,7 +44,7 @@ function App() {
   return (
     <div className="app-container">
       <header className="header animate-enter">
-        <h1 style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1rem' }}>
           <img src="https://kidsland.com.bd/logo.png" alt="Kidsland Logo" style={{ height: '50px', objectFit: 'contain' }} />
           Kidsland Dollar Report
         </h1>
