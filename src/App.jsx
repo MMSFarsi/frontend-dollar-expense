@@ -35,6 +35,19 @@ function App() {
     setActiveTab('list');
   };
 
+  const handleDeleteTransaction = async (id) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      await axios.delete(`https://backend-kidsland-dollar.vercel.app/api/transactions/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchTransactions(); // Refresh the list
+    } catch (error) {
+      console.error("Error deleting transaction:", error.response?.data || error.message);
+      alert("Failed to delete the transaction. Please try logging in again.");
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     setIsAuthenticated(false);
@@ -74,6 +87,7 @@ function App() {
             expense={totalExpense} 
             recentTransactions={transactions.slice(0, 5)} 
             onNavigate={(tab) => setActiveTab(tab)}
+            onDelete={isAuthenticated ? handleDeleteTransaction : null}
           />
         )}
 
@@ -86,7 +100,7 @@ function App() {
         )}
 
         {activeTab === 'list' && (
-          <TransactionList transactions={transactions} />
+          <TransactionList transactions={transactions} onDelete={isAuthenticated ? handleDeleteTransaction : null} />
         )}
       </main>
 

@@ -1,13 +1,38 @@
 import React, { useState } from 'react';
-import { ArrowDownRight, ArrowUpRight, Image as ImageIcon, Filter } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Image as ImageIcon, Filter, Trash2, Download } from 'lucide-react';
 
-const TransactionList = ({ transactions, hideFilter = false }) => {
+const TransactionList = ({ transactions, hideFilter = false, onDelete }) => {
   const [filter, setFilter] = useState('all');
 
   const filteredTransactions = transactions.filter(t => {
     if (filter === 'all') return true;
     return t.type === filter;
   });
+
+  const exportToCSV = () => {
+    // 1. Create CSV headers
+    let csvContent = "Date,Time,Type,Amount,Description\n";
+    
+    // 2. Add each row
+    transactions.forEach(t => {
+      const date = new Date(t.date).toLocaleDateString().replace(/,/g, '');
+      const time = new Date(t.date).toLocaleTimeString().replace(/,/g, '');
+      const type = t.type.toUpperCase();
+      const amount = t.amount.toFixed(2);
+      const desc = t.description.replace(/,/g, ' '); // remove commas from description so it doesnt break CSV
+      csvContent += `${date},${time},${type},${amount},${desc}\n`;
+    });
+
+    // 3. Create a blob and temporary link to download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `kidsland_records_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   if (transactions.length === 0) {
     return (
@@ -22,18 +47,28 @@ const TransactionList = ({ transactions, hideFilter = false }) => {
   return (
     <div className="transaction-list-wrapper animate-enter">
       {!hideFilter && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', background: 'white', padding: '1rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-          <Filter size={18} color="var(--primary)" />
-          <strong style={{ color: 'var(--text-main)' }}>Filter:</strong>
-          <select 
-            value={filter} 
-            onChange={(e) => setFilter(e.target.value)}
-            style={{ padding: '0.5rem', border: '1px solid #ddd', borderRadius: '8px', outline: 'none', cursor: 'pointer' }}
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.5rem', background: 'white', padding: '1rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <Filter size={18} color="var(--primary)" />
+            <strong style={{ color: 'var(--text-main)' }}>Filter:</strong>
+            <select 
+              value={filter} 
+              onChange={(e) => setFilter(e.target.value)}
+              style={{ padding: '0.5rem', border: '1px solid #ddd', borderRadius: '8px', outline: 'none', cursor: 'pointer' }}
+            >
+              <option value="all">All Records</option>
+              <option value="income">Income Only</option>
+              <option value="expense">Expense Only</option>
+            </select>
+          </div>
+          
+          <button 
+            className="btn" 
+            onClick={exportToCSV} 
+            style={{ width: 'auto', padding: '0.5rem 1rem', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', backgroundColor: 'var(--secondary)' }}
           >
-            <option value="all">All Records</option>
-            <option value="income">Income Only</option>
-            <option value="expense">Expense Only</option>
-          </select>
+            <Download size={16} /> Export to CSV
+          </button>
         </div>
       )}
       
@@ -65,6 +100,19 @@ const TransactionList = ({ transactions, hideFilter = false }) => {
                   className="proof-img" 
                 />
               </a>
+            )}
+            {onDelete && (
+              <button 
+                onClick={() => {
+                  if(window.confirm('Are you strictly sure you want to permanently delete this transaction?')) {
+                    onDelete(t._id);
+                  }
+                }}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--expense)', padding: '5px' }}
+                title="Delete Record"
+              >
+                <Trash2 size={24} />
+              </button>
             )}
           </div>
         </div>

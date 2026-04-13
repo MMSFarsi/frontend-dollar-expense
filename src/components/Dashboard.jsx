@@ -2,7 +2,7 @@ import React from 'react';
 import { Wallet, TrendingUp, TrendingDown, Clock, List as ListIcon } from 'lucide-react';
 import TransactionList from './TransactionList';
 
-const Dashboard = ({ balance, income, expense, recentTransactions = [], onNavigate }) => {
+const Dashboard = ({ balance, income, expense, recentTransactions = [], onNavigate, onDelete }) => {
   return (
     <div className="dashboard-wrapper">
       <div className="dashboard-grid">
@@ -29,7 +29,7 @@ const Dashboard = ({ balance, income, expense, recentTransactions = [], onNaviga
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', color: 'var(--primary)' }}>
           <Clock size={24} /> Recent Transactions
         </h3>
-        <TransactionList transactions={recentTransactions} hideFilter={true} />
+        <TransactionList transactions={recentTransactions} hideFilter={true} onDelete={onDelete} />
         {recentTransactions.length > 0 && (
           <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
             <button className="btn" onClick={() => onNavigate && onNavigate('list')} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '0.6rem 1.5rem', width: 'auto' }}>
