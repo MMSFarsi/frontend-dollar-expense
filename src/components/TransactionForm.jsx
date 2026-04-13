@@ -79,8 +79,15 @@ const TransactionForm = ({ onAdded }) => {
       );
       onAdded();
     } catch (err) {
-      // Fix 5: Log full error for easier debugging
       console.error('Transaction error:', err.response?.data);
+      
+      // Auto-logout if the token is expired or invalid
+      if (err.response?.status === 401) {
+        localStorage.removeItem('adminToken');
+        window.location.reload();
+        return;
+      }
+
       setError(err.response?.data?.message || 'Error adding record. Please try again.');
     } finally {
       setLoading(false);
