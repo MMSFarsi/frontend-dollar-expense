@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { UploadCloud, CheckCircle } from 'lucide-react';
+import Tesseract from 'tesseract.js';
 
 const TransactionForm = ({ onAdded }) => {
   const [formData, setFormData] = useState({
@@ -12,14 +13,63 @@ const TransactionForm = ({ onAdded }) => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [aiScanning, setAiScanning] = useState(false);
+  const [aiProgress, setAiProgress] = useState(0);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const triggerAIOcr = async (imgFile) => {
+    setAiScanning(true);
+    setAiProgress(0);
+    try {
+      const result = await Tesseract.recognize(imgFile, 'eng', {
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            setAiProgress(Math.round(m.progress * 100));
+          }
+        }
+      });
+      const text = result.data.text;
+      
+      let newAmount = formData.amount;
+      let newDesc = formData.description;
+
+      const dollarMatches = text.match(/\$?\s*([0-9,]+(?:\.[0-9]{2}))/g);
+      if (dollarMatches && dollarMatches.length > 0) {
+        const floats = dollarMatches.map(v => parseFloat(v.replace(/[^0-9.]/g, '')));
+        const maxFound = Math.max(...floats);
+        if (maxFound > 0) {
+          newAmount = maxFound.toString();
+        }
+      }
+
+      if (!newDesc) {
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 3);
+        if (lines.length > 0) {
+          const nameLine = lines.find(l => !/^[\d\s.,$]+$/.test(l));
+          if (nameLine) {
+            newDesc = `[AI Scanned] ${nameLine}`;
+          }
+        }
+      }
+
+      setFormData(prev => ({ ...prev, amount: newAmount, description: newDesc }));
+    } catch (err) {
+      console.error("AI Scanner Error:", err);
+    } finally {
+      setAiScanning(false);
+    }
+  };
+
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      setFile(selectedFile);
+      if (selectedFile.type.startsWith('image/')) {
+        triggerAIOcr(selectedFile);
+      }
     }
   };
 
@@ -177,6 +227,11 @@ const TransactionForm = ({ onAdded }) => {
               onChange={handleFileChange}
             />
           </div>
+          {aiScanning && (
+            <div style={{ marginTop: '1rem', color: 'var(--primary)', fontWeight: 'bold', animation: 'bounceIn 1s infinite' }}>
+              🤖 Extracting text with A.I... {aiProgress}%
+            </div>
+          )}
         </div>
 
         <button type="submit" className="btn" disabled={loading}>
