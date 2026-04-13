@@ -48,12 +48,6 @@ const Dashboard = ({ balance, income, expense, recentTransactions = [], onNaviga
 
   return (
     <div className="dashboard-wrapper">
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
-        <button className="btn" onClick={handleDownloadPdf} style={{ width: 'auto', padding: '0.6rem 1.2rem', fontSize: '0.9rem', backgroundColor: 'var(--text-dark)', color: 'var(--bg-color)', gap: '8px' }}>
-          <FileText size={18} /> Download PDF Report
-        </button>
-      </div>
-
       <div id="dashboard-pdf-root" style={{ padding: '10px' }}>
         <div className="dashboard-grid">
         <div className="card balance animate-enter" style={{animationDelay: '0.1s'}}>
@@ -76,7 +70,12 @@ const Dashboard = ({ balance, income, expense, recentTransactions = [], onNaviga
       </div>
 
       <div className="chart-container animate-enter" style={{ background: 'var(--card-bg)', padding: '2rem', borderRadius: '24px', boxShadow: 'var(--box-shadow)', marginTop: '2rem', animationDelay: '0.35s' }}>
-        <h3 style={{ marginBottom: '1.5rem', color: 'var(--primary)' }}>Income & Expense Trends</h3>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
+          <h3 style={{ margin: 0, color: 'var(--primary)' }}>Income & Expense Trends</h3>
+          <button className="btn" onClick={handleDownloadPdf} style={{ width: 'auto', padding: '0.5rem 1.2rem', fontSize: '0.85rem', backgroundColor: 'var(--text-dark)', color: 'var(--bg-color)', gap: '6px' }}>
+            <FileText size={16} /> Download PDF Report
+          </button>
+        </div>
         <div style={{ width: '100%', height: 300 }}>
           {chartData.length === 0 ? (
             <p style={{ textAlign: 'center', color: 'var(--text-light)', paddingTop: '4rem' }}>No data available for this timeframe.</p>

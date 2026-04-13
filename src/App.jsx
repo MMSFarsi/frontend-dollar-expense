@@ -94,9 +94,9 @@ function App() {
         </h1>
         <nav className="nav-links">
           <select 
+            className="date-filter-select"
             value={globalDateFilter} 
             onChange={(e) => setGlobalDateFilter(e.target.value)}
-            style={{ padding: '0.5rem 1rem', borderRadius: '100px', border: '1px solid #E2E8F0', background: 'var(--card-bg)', fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-dark)', outline: 'none', cursor: 'pointer', marginRight: '0.5rem' }}
           >
             <option value="all">All Time</option>
             <option value="today">Today</option>

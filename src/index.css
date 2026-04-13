@@ -216,6 +216,33 @@ select.form-control {
   gap: 0.5rem;
 }
 
+.date-filter-select {
+  appearance: none;
+  padding: 0.5rem 2.2rem 0.5rem 1.2rem;
+  border-radius: 100px;
+  border: 2px solid var(--input-border);
+  background-color: var(--card-bg);
+  /* Custom colored Chevron */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FF5A5F' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  background-size: 1em;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--primary);
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: all 0.3s ease;
+  margin-right: 0.5rem;
+}
+
+.date-filter-select:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 90, 95, 0.15);
+}
+
 .btn:hover {
   background: #E53935;
   transform: translateY(-2px);
