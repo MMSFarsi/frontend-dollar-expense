@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard';
 import TransactionForm from './components/TransactionForm';
 import TransactionList from './components/TransactionList';
 import Login from './components/Login';
+import Chatbot from './components/Chatbot';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -159,6 +160,9 @@ function App() {
           Developed By Mir MD Salman Farsi
         </a>
       </footer>
+
+      {/* Render AI Chatbot floating widget only if logged in */}
+      {isAuthenticated && <Chatbot />}
     </div>
   );
 }
