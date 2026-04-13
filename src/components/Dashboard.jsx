@@ -1,7 +1,9 @@
 import React from 'react';
-import { Wallet, TrendingUp, TrendingDown, Clock, List as ListIcon } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Clock, List as ListIcon, FileText } from 'lucide-react';
 import TransactionList from './TransactionList';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const Dashboard = ({ balance, income, expense, recentTransactions = [], onNavigate, onDelete, allFilteredTransactions = [] }) => {
   // Aggregate data by date
@@ -21,9 +23,39 @@ const Dashboard = ({ balance, income, expense, recentTransactions = [], onNaviga
 
   // Sort logically from oldest date (left) to newest date (right)
   const chartData = Object.values(chartDataMap).sort((a, b) => a.sortDate - b.sortDate);
+
+  const handleDownloadPdf = async () => {
+    const element = document.getElementById('dashboard-pdf-root');
+    if (!element) return;
+    
+    // Slight delay to ensure charts are firmly rendered if this was heavily dynamic
+    try {
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: document.documentElement.getAttribute('data-theme') === 'dark' ? '#121212' : '#F8F9FA' });
+      const imgData = canvas.toDataURL('image/png');
+      
+      // Calculate portrait A4 layout fit
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Kidsland_Report_${new Date().toLocaleDateString().replace(/\//g,'-')}.pdf`);
+    } catch (error) {
+      console.error("Failed generating PDF:", error);
+      alert("Could not generate PDF right now.");
+    }
+  };
+
   return (
     <div className="dashboard-wrapper">
-      <div className="dashboard-grid">
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
+        <button className="btn" onClick={handleDownloadPdf} style={{ width: 'auto', padding: '0.6rem 1.2rem', fontSize: '0.9rem', backgroundColor: 'var(--text-dark)', color: 'var(--bg-color)', gap: '8px' }}>
+          <FileText size={18} /> Download PDF Report
+        </button>
+      </div>
+
+      <div id="dashboard-pdf-root" style={{ padding: '10px' }}>
+        <div className="dashboard-grid">
         <div className="card balance animate-enter" style={{animationDelay: '0.1s'}}>
           <Wallet size={40} color="var(--secondary)" style={{marginBottom: '1rem'}} />
           <div className="card-title">Remaining Balance</div>
@@ -81,6 +113,7 @@ const Dashboard = ({ balance, income, expense, recentTransactions = [], onNaviga
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 };

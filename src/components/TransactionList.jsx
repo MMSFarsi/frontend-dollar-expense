@@ -87,14 +87,14 @@ const TransactionList = ({ transactions, hideFilter = false, onDelete }) => {
   return (
     <div className="transaction-list-wrapper animate-enter">
       {!hideFilter && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.5rem', background: 'white', padding: '1rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.5rem', background: 'var(--card-bg)', padding: '1rem', borderRadius: '12px', boxShadow: 'var(--box-shadow)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <Filter size={18} color="var(--primary)" />
-            <strong style={{ color: 'var(--text-main)' }}>Filter:</strong>
+            <strong style={{ color: 'var(--text-dark)' }}>Filter:</strong>
             <select 
               value={filter} 
               onChange={(e) => setFilter(e.target.value)}
-              style={{ padding: '0.5rem', border: '1px solid #ddd', borderRadius: '8px', outline: 'none', cursor: 'pointer' }}
+              style={{ padding: '0.5rem', border: '2px solid var(--input-border)', background: 'var(--bg-color)', color: 'var(--text-dark)', borderRadius: '8px', outline: 'none', cursor: 'pointer' }}
             >
               <option value="all">All Records</option>
               <option value="income">Income Only</option>

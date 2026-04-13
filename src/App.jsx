@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { PlusCircle, Wallet, LayoutDashboard, List as ListIcon, LogOut } from 'lucide-react';
+import { PlusCircle, Wallet, LayoutDashboard, List as ListIcon, LogOut, Moon, Sun } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import TransactionForm from './components/TransactionForm';
 import TransactionList from './components/TransactionList';
@@ -11,6 +11,12 @@ function App() {
   const [transactions, setTransactions] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [globalDateFilter, setGlobalDateFilter] = useState('all');
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -107,6 +113,13 @@ function App() {
           <a href="#" className={activeTab === 'list' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveTab('list'); }}>
             <ListIcon size={16} style={{marginRight: '6px'}}/> All Records
           </a>
+          <button 
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} 
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', marginLeft: '0.5rem', color: 'var(--text-dark)' }}
+            title="Toggle Theme"
+          >
+            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+          </button>
           {isAuthenticated && (
             <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: 'var(--expense)' }}>
               <LogOut size={16} style={{marginRight: '6px'}}/> Logout
