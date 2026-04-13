@@ -1,8 +1,48 @@
-import React, { useState } from 'react';
-import { ArrowDownRight, ArrowUpRight, Image as ImageIcon, Filter, Trash2, Download } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowDownRight, ArrowUpRight, Image as ImageIcon, Filter, Trash2, Download, X } from 'lucide-react';
 
 const TransactionList = ({ transactions, hideFilter = false, onDelete }) => {
   const [filter, setFilter] = useState('all');
+  const [selectedImage, setSelectedImage] = useState(null);
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        setSelectedImage(null);
+      }
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  const openFullscreen = (imgUrl) => {
+    setSelectedImage(imgUrl);
+    setTimeout(() => {
+      if (modalRef.current) {
+        if (modalRef.current.requestFullscreen) {
+          modalRef.current.requestFullscreen();
+        } else if (modalRef.current.webkitRequestFullscreen) {
+          modalRef.current.webkitRequestFullscreen();
+        }
+      }
+    }, 50);
+  };
+
+  const closeFullscreen = () => {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
+    setSelectedImage(null);
+  };
 
   const filteredTransactions = transactions.filter(t => {
     if (filter === 'all') return true;
@@ -92,15 +132,14 @@ const TransactionList = ({ transactions, hideFilter = false, onDelete }) => {
             <div className={`t-amount ${t.type}`}>
               {t.type === 'income' ? '+' : '-'}${t.amount.toFixed(2)}
             </div>
-            {t.proofImage && (
-              <a href={(t.proofImage.startsWith('http') || t.proofImage.startsWith('data:')) ? t.proofImage : `https://backend-kidsland-dollar.vercel.app${t.proofImage}`} target="_blank" rel="noopener noreferrer" title="View Proof">
-                <img 
-                  src={(t.proofImage.startsWith('http') || t.proofImage.startsWith('data:')) ? t.proofImage : `https://backend-kidsland-dollar.vercel.app${t.proofImage}`} 
-                  alt="Proof" 
-                  className="proof-img" 
-                />
-              </a>
-            )}
+            {t.proofImage && (() => {
+              const imgUrl = (t.proofImage.startsWith('http') || t.proofImage.startsWith('data:')) ? t.proofImage : `https://backend-kidsland-dollar.vercel.app${t.proofImage}`;
+              return (
+                <div onClick={() => openFullscreen(imgUrl)} title="View Proof Fullscreen" style={{ cursor: 'fullscreen' }}>
+                  <img src={imgUrl} alt="Proof" className="proof-img" />
+                </div>
+              );
+            })()}
             {onDelete && (
               <button 
                 onClick={() => {
@@ -118,6 +157,29 @@ const TransactionList = ({ transactions, hideFilter = false, onDelete }) => {
         </div>
         )))}
       </div>
+
+      {/* Full Browser Native Fullscreen Modal Component */}
+      {selectedImage && (
+        <div 
+          ref={modalRef}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#000', zIndex: 99999, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        >
+          <button 
+            onClick={closeFullscreen} 
+            style={{ position: 'absolute', top: '30px', right: '30px', background: 'rgba(255,255,255,0.15)', border: 'none', color: 'white', cursor: 'pointer', borderRadius: '50%', width: '50px', height: '50px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            title="Close Fullscreen"
+          >
+            <X size={30} />
+          </button>
+          <img 
+            src={selectedImage} 
+            alt="Proof Fullsize" 
+            style={{ maxWidth: '100vw', maxHeight: '100vh', objectFit: 'contain' }} 
+            onClick={(e) => Object.hasOwn(document, 'pictureInPictureEnabled') } /* Noop prevent error */
+          />
+        </div>
+      )}
+
     </div>
   );
 };
