@@ -1,7 +1,14 @@
-import React from 'react';
-import { ArrowDownRight, ArrowUpRight, Image as ImageIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowDownRight, ArrowUpRight, Image as ImageIcon, Filter } from 'lucide-react';
 
-const TransactionList = ({ transactions }) => {
+const TransactionList = ({ transactions, hideFilter = false }) => {
+  const [filter, setFilter] = useState('all');
+
+  const filteredTransactions = transactions.filter(t => {
+    if (filter === 'all') return true;
+    return t.type === filter;
+  });
+
   if (transactions.length === 0) {
     return (
       <div className="form-container animate-enter" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
@@ -13,8 +20,28 @@ const TransactionList = ({ transactions }) => {
   }
 
   return (
-    <div className="transaction-list animate-enter">
-      {transactions.map((t, index) => (
+    <div className="transaction-list-wrapper animate-enter">
+      {!hideFilter && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', background: 'white', padding: '1rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+          <Filter size={18} color="var(--primary)" />
+          <strong style={{ color: 'var(--text-main)' }}>Filter:</strong>
+          <select 
+            value={filter} 
+            onChange={(e) => setFilter(e.target.value)}
+            style={{ padding: '0.5rem', border: '1px solid #ddd', borderRadius: '8px', outline: 'none', cursor: 'pointer' }}
+          >
+            <option value="all">All Records</option>
+            <option value="income">Income Only</option>
+            <option value="expense">Expense Only</option>
+          </select>
+        </div>
+      )}
+      
+      <div className="transaction-list">
+        {filteredTransactions.length === 0 ? (
+          <p style={{ textAlign: 'center', color: 'var(--text-light)', padding: '2rem 0' }}>No {filter} found.</p>
+        ) : (
+          filteredTransactions.map((t, index) => (
         <div className="transaction-item" key={t._id} style={{animationDelay: `${index * 0.1}s`}}>
           <div className="t-info">
             <div className={`t-icon ${t.type}`}>
@@ -41,7 +68,8 @@ const TransactionList = ({ transactions }) => {
             )}
           </div>
         </div>
-      ))}
+        )))}
+      </div>
     </div>
   );
 };

@@ -68,7 +68,13 @@ function App() {
 
       <main className="animate-enter" style={{animationDelay: '0.1s'}}>
         {activeTab === 'dashboard' && (
-          <Dashboard balance={balance} income={totalIncome} expense={totalExpense} />
+          <Dashboard 
+            balance={balance} 
+            income={totalIncome} 
+            expense={totalExpense} 
+            recentTransactions={transactions.slice(0, 5)} 
+            onNavigate={(tab) => setActiveTab(tab)}
+          />
         )}
 
         {activeTab === 'add' && (

@@ -333,6 +333,14 @@ select.form-control {
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+  html {
+    font-size: 14px; /* Automatically scales down all rem-based paddings and fonts */
+  }
+
+  body {
+    -webkit-text-size-adjust: 100%;
+  }
+
   .app-container {
     padding: 1rem;
   }
@@ -340,9 +348,13 @@ select.form-control {
   .header {
     flex-direction: column;
     gap: 1rem;
-    padding: 1.5rem;
-    border-radius: 24px;
+    padding: 1rem;
+    border-radius: 20px;
     text-align: center;
+  }
+
+  .header h1 {
+    font-size: 1.3rem; /* Smaller header */
   }
 
   .nav-links {
@@ -352,8 +364,8 @@ select.form-control {
   }
 
   .nav-links a {
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
   }
 
   .dashboard-grid {
@@ -361,18 +373,45 @@ select.form-control {
     gap: 1rem;
   }
 
+  .card {
+    padding: 1.5rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
   .card-value {
-    font-size: 2.5rem;
+    font-size: 2rem; /* Reduced from 2.5rem */
   }
 
   .form-container {
-    padding: 1.5rem;
+    padding: 1.2rem;
   }
 
   .transaction-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.5rem;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .t-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .t-details h4 {
+    font-size: 1rem;
+  }
+
+  .t-details p {
+    font-size: 0.8rem;
+  }
+
+  .t-amount {
+    font-size: 1.2rem;
   }
 
   .transaction-item > div:last-child {
