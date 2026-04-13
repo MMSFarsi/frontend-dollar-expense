@@ -10,6 +10,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [transactions, setTransactions] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [globalDateFilter, setGlobalDateFilter] = useState('all');
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -26,8 +27,32 @@ function App() {
     }
   };
 
-  const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
-  const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
+  const getFilteredTransactions = () => {
+    if (globalDateFilter === 'all') return transactions;
+    const now = new Date();
+    return transactions.filter(t => {
+      const tDate = new Date(t.date);
+      if (globalDateFilter === 'today') {
+        return tDate.toDateString() === now.toDateString();
+      }
+      if (globalDateFilter === 'week') {
+        const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return tDate >= lastWeek;
+      }
+      if (globalDateFilter === 'month') {
+        return tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear();
+      }
+      if (globalDateFilter === 'year') {
+        return tDate.getFullYear() === now.getFullYear();
+      }
+      return true;
+    });
+  };
+
+  const filteredTransactions = getFilteredTransactions();
+
+  const totalIncome = filteredTransactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
+  const totalExpense = filteredTransactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
   const balance = totalIncome - totalExpense;
 
   const handleTransactionAdded = () => {
@@ -62,18 +87,29 @@ function App() {
           Kidsland Dollar Report
         </h1>
         <nav className="nav-links">
+          <select 
+            value={globalDateFilter} 
+            onChange={(e) => setGlobalDateFilter(e.target.value)}
+            style={{ padding: '0.5rem 1rem', borderRadius: '100px', border: '1px solid #E2E8F0', background: 'var(--card-bg)', fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-dark)', outline: 'none', cursor: 'pointer', marginRight: '0.5rem' }}
+          >
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="week">Past 7 Days</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+          </select>
           <a href="#" className={activeTab === 'dashboard' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveTab('dashboard'); }}>
-            <LayoutDashboard size={18} style={{marginRight: '5px', verticalAlign: 'middle'}}/> Dashboard
+            <LayoutDashboard size={16} style={{marginRight: '6px'}}/> Dashboard
           </a>
           <a href="#" className={activeTab === 'add' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveTab('add'); }}>
-            <PlusCircle size={18} style={{marginRight: '5px', verticalAlign: 'middle'}}/> Add Record
+            <PlusCircle size={16} style={{marginRight: '6px'}}/> Add Record
           </a>
           <a href="#" className={activeTab === 'list' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setActiveTab('list'); }}>
-            <ListIcon size={18} style={{marginRight: '5px', verticalAlign: 'middle'}}/> All Records
+            <ListIcon size={16} style={{marginRight: '6px'}}/> All Records
           </a>
           {isAuthenticated && (
             <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} style={{ color: 'var(--expense)' }}>
-              <LogOut size={18} style={{marginRight: '5px', verticalAlign: 'middle'}}/> Logout
+              <LogOut size={16} style={{marginRight: '6px'}}/> Logout
             </a>
           )}
         </nav>
@@ -85,9 +121,10 @@ function App() {
             balance={balance} 
             income={totalIncome} 
             expense={totalExpense} 
-            recentTransactions={transactions.slice(0, 5)} 
+            recentTransactions={filteredTransactions.slice(0, 5)} 
             onNavigate={(tab) => setActiveTab(tab)}
             onDelete={isAuthenticated ? handleDeleteTransaction : null}
+            allFilteredTransactions={filteredTransactions}
           />
         )}
 
@@ -100,7 +137,7 @@ function App() {
         )}
 
         {activeTab === 'list' && (
-          <TransactionList transactions={transactions} onDelete={isAuthenticated ? handleDeleteTransaction : null} />
+          <TransactionList transactions={filteredTransactions} onDelete={isAuthenticated ? handleDeleteTransaction : null} />
         )}
       </main>
 

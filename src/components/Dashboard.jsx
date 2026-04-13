@@ -1,8 +1,26 @@
 import React from 'react';
 import { Wallet, TrendingUp, TrendingDown, Clock, List as ListIcon } from 'lucide-react';
 import TransactionList from './TransactionList';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const Dashboard = ({ balance, income, expense, recentTransactions = [], onNavigate, onDelete }) => {
+const Dashboard = ({ balance, income, expense, recentTransactions = [], onNavigate, onDelete, allFilteredTransactions = [] }) => {
+  // Aggregate data by date
+  const chartDataMap = {};
+  allFilteredTransactions.forEach(t => {
+    // Format "Apr 1"
+    const dateStr = new Date(t.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    if (!chartDataMap[dateStr]) {
+      chartDataMap[dateStr] = { name: dateStr, Income: 0, Expense: 0, sortDate: new Date(t.date) };
+    }
+    if (t.type === 'income') {
+      chartDataMap[dateStr].Income += t.amount;
+    } else {
+      chartDataMap[dateStr].Expense += t.amount;
+    }
+  });
+
+  // Sort logically from oldest date (left) to newest date (right)
+  const chartData = Object.values(chartDataMap).sort((a, b) => a.sortDate - b.sortDate);
   return (
     <div className="dashboard-wrapper">
       <div className="dashboard-grid">
@@ -22,6 +40,31 @@ const Dashboard = ({ balance, income, expense, recentTransactions = [], onNaviga
           <TrendingDown size={40} color="var(--expense)" style={{marginBottom: '1rem'}} />
           <div className="card-title">Total Expenses</div>
           <div className="card-value">${expense.toFixed(2)}</div>
+        </div>
+      </div>
+
+      <div className="chart-container animate-enter" style={{ background: 'var(--card-bg)', padding: '2rem', borderRadius: '24px', boxShadow: 'var(--box-shadow)', marginTop: '2rem', animationDelay: '0.35s' }}>
+        <h3 style={{ marginBottom: '1.5rem', color: 'var(--primary)' }}>Income & Expense Trends</h3>
+        <div style={{ width: '100%', height: 300 }}>
+          {chartData.length === 0 ? (
+            <p style={{ textAlign: 'center', color: 'var(--text-light)', paddingTop: '4rem' }}>No data available for this timeframe.</p>
+          ) : (
+            <ResponsiveContainer>
+              <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-light)'}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-light)'}} tickFormatter={(val) => `$${val}`} />
+                <Tooltip 
+                  cursor={{fill: 'rgba(0,0,0,0.02)'}}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
+                  formatter={(value) => [`$${value.toFixed(2)}`, undefined]}
+                />
+                <Legend iconType="circle" wrapperStyle={{ paddingTop: '10px' }} />
+                <Bar dataKey="Income" fill="var(--income)" radius={[4, 4, 0, 0]} maxBarSize={50} />
+                <Bar dataKey="Expense" fill="var(--expense)" radius={[4, 4, 0, 0]} maxBarSize={50} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 
