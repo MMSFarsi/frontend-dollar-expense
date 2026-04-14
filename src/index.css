@@ -374,6 +374,26 @@ select.form-control {
   animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
+/* Skeleton Loading Animation */
+.skeleton {
+  background: var(--input-border);
+  background: linear-gradient(
+    110deg,
+    var(--input-border) 8%,
+    var(--card-bg) 18%,
+    var(--input-border) 33%
+  );
+  background-size: 200% 100%;
+  animation: 1.5s shimmer linear infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  to {
+    background-position-x: -200%;
+  }
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   html {

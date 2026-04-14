@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowDownRight, ArrowUpRight, Image as ImageIcon, Filter, Trash2, Download, X } from 'lucide-react';
 
-const TransactionList = ({ transactions, hideFilter = false, onDelete }) => {
+const TransactionList = ({ transactions, hideFilter = false, onDelete, isLoading = false }) => {
   const [filter, setFilter] = useState('all');
   const [selectedImage, setSelectedImage] = useState(null);
   const modalRef = useRef(null);
@@ -74,7 +74,7 @@ const TransactionList = ({ transactions, hideFilter = false, onDelete }) => {
     document.body.removeChild(link);
   };
 
-  if (transactions.length === 0) {
+  if (!isLoading && transactions.length === 0) {
     return (
       <div className="form-container animate-enter" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
         <ImageIcon size={50} color="var(--text-light)" style={{ marginBottom: '1rem' }} />
@@ -113,7 +113,11 @@ const TransactionList = ({ transactions, hideFilter = false, onDelete }) => {
       )}
       
       <div className="transaction-list">
-        {filteredTransactions.length === 0 ? (
+        {isLoading ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="transaction-item skeleton" style={{ height: '90px', animationDelay: `${i * 0.1}s` }}></div>
+          ))
+        ) : filteredTransactions.length === 0 ? (
           <p style={{ textAlign: 'center', color: 'var(--text-light)', padding: '2rem 0' }}>No {filter} found.</p>
         ) : (
           filteredTransactions.map((t, index) => (

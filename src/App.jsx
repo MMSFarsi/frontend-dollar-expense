@@ -13,6 +13,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [globalDateFilter, setGlobalDateFilter] = useState('all');
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -26,11 +27,14 @@ function App() {
   }, []);
 
   const fetchTransactions = async () => {
+    setIsLoading(true);
     try {
       const res = await axios.get('https://backend-kidsland-dollar.vercel.app/api/transactions');
       setTransactions(res.data);
     } catch (error) {
       console.error("Error fetching transactions", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -139,6 +143,7 @@ function App() {
             onNavigate={(tab) => setActiveTab(tab)}
             onDelete={isAuthenticated ? handleDeleteTransaction : null}
             allFilteredTransactions={filteredTransactions}
+            isLoading={isLoading}
           />
         )}
 
@@ -151,7 +156,7 @@ function App() {
         )}
 
         {activeTab === 'list' && (
-          <TransactionList transactions={filteredTransactions} onDelete={isAuthenticated ? handleDeleteTransaction : null} />
+          <TransactionList transactions={filteredTransactions} onDelete={isAuthenticated ? handleDeleteTransaction : null} isLoading={isLoading} />
         )}
       </main>
 

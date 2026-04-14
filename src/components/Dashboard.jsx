@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-const Dashboard = ({ balance, income, expense, recentTransactions = [], onNavigate, onDelete, allFilteredTransactions = [] }) => {
+const Dashboard = ({ balance, income, expense, recentTransactions = [], onNavigate, onDelete, allFilteredTransactions = [], isLoading = false }) => {
   // Aggregate data by date
   const chartDataMap = {};
   allFilteredTransactions.forEach(t => {
@@ -50,24 +50,34 @@ const Dashboard = ({ balance, income, expense, recentTransactions = [], onNaviga
     <div className="dashboard-wrapper">
       <div id="dashboard-pdf-root" style={{ padding: '10px' }}>
         <div className="dashboard-grid">
-        <div className="card balance animate-enter" style={{animationDelay: '0.1s'}}>
-          <Wallet size={40} color="var(--secondary)" style={{marginBottom: '1rem'}} />
-          <div className="card-title">Remaining Balance</div>
-          <div className="card-value">${balance.toFixed(2)}</div>
+          {isLoading ? (
+            <>
+              <div className="card skeleton" style={{ height: '160px' }}></div>
+              <div className="card skeleton" style={{ height: '160px', animationDelay: '0.1s' }}></div>
+              <div className="card skeleton" style={{ height: '160px', animationDelay: '0.2s' }}></div>
+            </>
+          ) : (
+            <>
+              <div className="card balance animate-enter" style={{animationDelay: '0.1s'}}>
+                <Wallet size={40} color="var(--secondary)" style={{marginBottom: '1rem'}} />
+                <div className="card-title">Remaining Balance</div>
+                <div className="card-value">${balance.toFixed(2)}</div>
+              </div>
+              
+              <div className="card income animate-enter" style={{animationDelay: '0.2s'}}>
+                <TrendingUp size={40} color="var(--income)" style={{marginBottom: '1rem'}} />
+                <div className="card-title">Total Dollar Purchased</div>
+                <div className="card-value">${income.toFixed(2)}</div>
+              </div>
+              
+              <div className="card expense animate-enter" style={{animationDelay: '0.3s'}}>
+                <TrendingDown size={40} color="var(--expense)" style={{marginBottom: '1rem'}} />
+                <div className="card-title">Total Expenses</div>
+                <div className="card-value">${expense.toFixed(2)}</div>
+              </div>
+            </>
+          )}
         </div>
-        
-        <div className="card income animate-enter" style={{animationDelay: '0.2s'}}>
-          <TrendingUp size={40} color="var(--income)" style={{marginBottom: '1rem'}} />
-          <div className="card-title">Total Dollar Purchased</div>
-          <div className="card-value">${income.toFixed(2)}</div>
-        </div>
-        
-        <div className="card expense animate-enter" style={{animationDelay: '0.3s'}}>
-          <TrendingDown size={40} color="var(--expense)" style={{marginBottom: '1rem'}} />
-          <div className="card-title">Total Expenses</div>
-          <div className="card-value">${expense.toFixed(2)}</div>
-        </div>
-      </div>
 
       <div className="chart-container animate-enter" style={{ background: 'var(--card-bg)', padding: '2rem', borderRadius: '24px', boxShadow: 'var(--box-shadow)', marginTop: '2rem', animationDelay: '0.35s' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
@@ -77,7 +87,9 @@ const Dashboard = ({ balance, income, expense, recentTransactions = [], onNaviga
           </button>
         </div>
         <div style={{ width: '100%', height: 300 }}>
-          {chartData.length === 0 ? (
+          {isLoading ? (
+            <div className="skeleton" style={{ width: '100%', height: '100%', borderRadius: '12px' }}></div>
+          ) : chartData.length === 0 ? (
             <p style={{ textAlign: 'center', color: 'var(--text-light)', paddingTop: '4rem' }}>No data available for this timeframe.</p>
           ) : (
             <ResponsiveContainer>
@@ -103,7 +115,7 @@ const Dashboard = ({ balance, income, expense, recentTransactions = [], onNaviga
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', color: 'var(--primary)' }}>
           <Clock size={24} /> Recent Transactions
         </h3>
-        <TransactionList transactions={recentTransactions} hideFilter={true} onDelete={onDelete} />
+        <TransactionList transactions={recentTransactions} hideFilter={true} onDelete={onDelete} isLoading={isLoading} />
         {recentTransactions.length > 0 && (
           <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
             <button className="btn" onClick={() => onNavigate && onNavigate('list')} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '0.6rem 1.5rem', width: 'auto' }}>
