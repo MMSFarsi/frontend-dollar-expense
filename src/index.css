@@ -561,6 +561,16 @@ select.form-control {
     color: var(--primary);
   }
 
+  .low-balance-alert {
+    font-size: 0.68rem;
+    padding: 0.5rem 0.8rem;
+    gap: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: 10px;
+  }
+
   .dashboard-grid {
     grid-template-columns: 1fr;
     gap: 1rem;

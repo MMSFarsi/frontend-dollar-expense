@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wallet, TrendingUp, TrendingDown, Clock, List as ListIcon, FileText, AlertTriangle, Settings } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Clock, List as ListIcon, FileText, AlertTriangle } from 'lucide-react';
 import TransactionList from './TransactionList';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import jsPDF from 'jspdf';
@@ -38,20 +38,6 @@ const Dashboard = ({ balance, income, expense, recentTransactions = [], onNaviga
     e.currentTarget.style.transform = '';
   };
 
-  // Low Balance Alert
-  const [threshold, setThreshold] = useState(() => parseFloat(localStorage.getItem('balanceThreshold') || '15'));
-  const [editingThreshold, setEditingThreshold] = useState(false);
-  const [tempThreshold, setTempThreshold] = useState(threshold);
-  const isLowBalance = !isLoading && balance < threshold;
-
-  const saveThreshold = () => {
-    const val = parseFloat(tempThreshold);
-    if (!isNaN(val) && val >= 0) {
-      setThreshold(val);
-      localStorage.setItem('balanceThreshold', val);
-    }
-    setEditingThreshold(false);
-  };
 
   const handleDownloadPdf = async () => {
     const element = document.getElementById('dashboard-pdf-root');
@@ -79,37 +65,12 @@ const Dashboard = ({ balance, income, expense, recentTransactions = [], onNaviga
     <div className="dashboard-wrapper">
 
       {/* Low Balance Alert Banner */}
-      {isLowBalance && (
-        <div className="low-balance-alert">
-          <AlertTriangle size={20} />
-          ⚠️ Low Balance Warning! Your balance of <strong>${balance.toFixed(2)}</strong> is below your alert threshold of <strong>${threshold.toFixed(2)}</strong>.
+      {!isLoading && balance <= 10 && (
+        <div className="low-balance-alert" style={{ background: 'linear-gradient(135deg, #b71c1c, #7f0000)' }}>
+          <AlertTriangle size={16} />
+          🚨 Balance is below $10 — Please contact <strong>Salman</strong> to deposit immediately!
         </div>
       )}
-
-      {/* Threshold configurator */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', alignItems: 'center', gap: '10px' }}>
-        {editingThreshold ? (
-          <>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>Alert me below $</span>
-            <input
-              type="number"
-              value={tempThreshold}
-              onChange={(e) => setTempThreshold(e.target.value)}
-              style={{ width: '80px', padding: '0.3rem 0.5rem', borderRadius: '8px', border: '2px solid var(--primary)', outline: 'none', background: 'var(--card-bg)', color: 'var(--text-dark)', fontWeight: 'bold' }}
-              autoFocus
-            />
-            <button onClick={saveThreshold} style={{ background: 'var(--income)', color: 'white', border: 'none', borderRadius: '8px', padding: '0.3rem 0.8rem', cursor: 'pointer', fontWeight: 'bold' }}>Save</button>
-            <button onClick={() => setEditingThreshold(false)} style={{ background: 'var(--expense)', color: 'white', border: 'none', borderRadius: '8px', padding: '0.3rem 0.8rem', cursor: 'pointer' }}>✕</button>
-          </>
-        ) : (
-          <button
-            onClick={() => { setTempThreshold(threshold); setEditingThreshold(true); }}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'transparent', border: '2px solid var(--input-border)', borderRadius: '100px', padding: '0.3rem 0.8rem', cursor: 'pointer', color: 'var(--text-light)', fontSize: '0.8rem', fontWeight: '600' }}
-          >
-            <Settings size={14} /> Alert Threshold: ${threshold.toFixed(2)}
-          </button>
-        )}
-      </div>
 
       <div id="dashboard-pdf-root" style={{ padding: '10px' }}>
         <div className="dashboard-grid">
