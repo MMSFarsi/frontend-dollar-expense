@@ -102,6 +102,13 @@ function App() {
     if (activeTab === 'add') setActiveTab('dashboard');
   };
 
+  const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return '☀️ Good Morning';
+    if (h < 17) return '🌤️ Good Afternoon';
+    return '🌙 Good Evening';
+  };
+
   return (
     <div className="app-container">
       {/* Offline Notification Banner */}
@@ -112,9 +119,12 @@ function App() {
       )}
 
       <header className="header animate-enter">
-        <h1 style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1rem' }}>
-          <img src="https://kidsland.com.bd/logo.png" alt="Kidsland Logo" style={{ height: '50px', objectFit: 'contain' }} />
-          Kidsland Dollar Report
+        <h1 style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px', fontSize: '1rem' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img src="https://kidsland.com.bd/logo.png" alt="Kidsland Logo" style={{ height: '40px', objectFit: 'contain' }} />
+            Kidsland Dollar Report
+          </span>
+          <span className="hero-greeting">{getGreeting()}, 👋 Here's Dollar summary</span>
         </h1>
         <nav className="nav-links">
           <select 
@@ -152,7 +162,7 @@ function App() {
         </nav>
       </header>
 
-      <main className="animate-enter" style={{animationDelay: '0.1s'}}>
+      <main key={activeTab} className="page-fade" style={{ marginTop: '0.5rem' }}>
         {activeTab === 'dashboard' && (
           <Dashboard 
             balance={balance} 
@@ -185,8 +195,34 @@ function App() {
         </a>
       </footer>
 
-      {/* Render AI Chatbot floating widget only if logged in */}
+      {/* AI Chatbot - admin only */}
       {isAuthenticated && <Chatbot />}
+
+      {/* Mobile Bottom Tab Bar */}
+      <nav className="bottom-tab-bar">
+        <button className={activeTab === 'dashboard' ? 'active' : ''} onClick={() => setActiveTab('dashboard')}>
+          <LayoutDashboard size={22} />
+          Dashboard
+        </button>
+        <button className={activeTab === 'add' ? 'active' : ''} onClick={() => setActiveTab('add')}>
+          <PlusCircle size={22} />
+          Add Record
+        </button>
+        <button className={activeTab === 'list' ? 'active' : ''} onClick={() => setActiveTab('list')}>
+          <ListIcon size={22} />
+          Records
+        </button>
+        <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} style={{ color: 'var(--text-light)' }}>
+          {theme === 'light' ? <Moon size={22} /> : <Sun size={22} />}
+          Theme
+        </button>
+        {isAuthenticated && (
+          <button onClick={handleLogout} style={{ color: 'var(--expense)' }}>
+            <LogOut size={22} />
+            Logout
+          </button>
+        )}
+      </nav>
     </div>
   );
 }
