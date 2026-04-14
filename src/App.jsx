@@ -14,6 +14,18 @@ function App() {
   const [globalDateFilter, setGlobalDateFilter] = useState('all');
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const [isLoading, setIsLoading] = useState(true);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const goOnline  = () => setIsOnline(true);
+    const goOffline = () => setIsOnline(false);
+    window.addEventListener('online',  goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online',  goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -92,6 +104,13 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Offline Notification Banner */}
+      {!isOnline && (
+        <div className="offline-banner">
+          ⚠️ No Internet Connection.
+        </div>
+      )}
+
       <header className="header animate-enter">
         <h1 style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '1rem' }}>
           <img src="https://kidsland.com.bd/logo.png" alt="Kidsland Logo" style={{ height: '50px', objectFit: 'contain' }} />
